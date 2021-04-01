@@ -1,0 +1,3 @@
+class OverlapException(Exception):
+    pass
+

@@ -1,0 +1,14 @@
+## {Column_name}
+
+Description: {Description}
+
+Number of unique elements: {N_unique}
+
+Most common:
+| Value | Percentage of example data |
+| --- | --- |
+| {Common_1}  |
+| {Common_2}  |
+| {Common_3}  |
+
+Notes: {Notes}
