@@ -4,6 +4,7 @@ import pandas as pd
 from .group_to_reference import GroupReference
 from .description_frame import DescriptionFrame
 
+
 class ReferenceSpider:
 
     def __init__(self, file_path):
@@ -18,7 +19,7 @@ class ReferenceSpider:
             if ".xls" in i:
                 sheets = pd.read_excel(file, sheet_name=None)
                 for s in sheets:
-                    yield s
+                    yield sheets[s]
 
             if ".csv" in i:
                 yield pd.read_csv(file)
@@ -30,6 +31,3 @@ class ReferenceSpider:
     def to_reference(self, description_frame: DescriptionFrame = None):
         return GroupReference(self.path_handler(), description_frame)
 
-
-if __name__ == '__main__':
-    pass
