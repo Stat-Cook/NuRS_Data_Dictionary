@@ -1,10 +1,23 @@
-import pandas as pd
+"""
+Implement a frame to track the human descriptors and notes on each data column.
+"""
+
 from typing import Union
+import pandas as pd
 
 from .exceptions import OverlapException
+from .frame_to_word import frame_to_word
+from .word2reference.read_word import WordReader
 
 
 class DescriptionFrame:
+    """
+    Parameters
+    ----------
+    data: pandas.DataFrame
+        A data frame containing 'Description' and 'Notes' columns.
+        Each row is a different column.
+    """
 
     def __init__(self, data: pd.DataFrame):
         self.default_columns = ["Description", "Notes"]
@@ -13,24 +26,106 @@ class DescriptionFrame:
 
     @classmethod
     def from_file(cls, file_path: str, sheet_name=0):
-        file_path = file_path
+        """
+        Generate DescriptionFrame from excel
+        Parameters
+        ----------
+        file_path: str
+            Path to an excel file.
+        sheet_name: str [optional]
+            The sheet on which the DescriptionFrame is stored.
+        Returns
+        -------
+        DescriptionFrame
+        """
         data = pd.read_excel(file_path, sheet_name=sheet_name)
         return cls(data)
 
     @classmethod
     def blank_from_index(cls, index):
+        """
+        Generate a blank DescriptionFrame from a list of column names.
+        Parameters
+        ----------
+        index: List[str]
+            list of column names to use as the index.
+        Returns
+        -------
+        DescriptionFrame
+        """
         data = pd.DataFrame(columns=["Description", "Notes"], index=index)
         return cls(data)
 
     @classmethod
     def via_concat(cls, frame1: pd.DataFrame, frame2: pd.DataFrame):
+        """
+        Generate a DescriptionFrame by concatenating two data frames.
+        Parameters
+        ----------
+        frame1: pd.DataFrame
+            A pandas DataFrame with columns=["Description", "Notes"]
+        frame2: pd.DataFrame
+            A pandas DataFrame with columns=["Description", "Notes"]
+        Returns
+        -------
+        DescriptionFrame
+        """
         data = pd.concat([frame1, frame2])
         return cls(data)
 
+    @classmethod
+    def from_word(cls, file: str):
+        """
+        Generate a DescriptionFrame from word.
+        Looks for h2 headings for the index, and h3 headings for the columns.
+        Parameters
+        ----------
+        file: str
+            The path to the word file.
+        Returns
+        -------
+        DescriptionFrame
+        """
+        reader = WordReader(file)
+        data = reader.parse_document()
+        data = pd.DataFrame(data).T
+        return cls(data)
+
     def to_excel(self, file_path: str, sheet_name=1):
+        """
+        Save the frame to excel format.
+        Parameters
+        ----------
+        file_path: str
+            Path to save the file at.
+        sheet_name: str [optional]
+            Name for the sheet in excel.
+        Returns
+        -------
+        None
+        """
         self.data.to_excel(file_path, sheet_name=sheet_name)
 
-    def add_rows(self, new_items: Union[list, str], overlap="unique"):
+    def to_word(self, file):
+        """
+        Save the frame to word - writes each index as:
+        index [h2]
+        Description [h3]
+        ...
+        Notes [h3]
+        ...
+        next_index...
+        Parameters
+        ----------
+        file: str
+            file path to write the word doc at.
+        Returns
+        -------
+        None
+        """
+        frame_to_word(self.data, file)
+
+    def add_rows(self, new_items: Union[list, str], overlap="unique") -> None:
         """
         Update the index of the DescriptionFrame with new value(s).
         Parameters
@@ -92,12 +187,27 @@ class DescriptionFrame:
 
     @property
     def index(self):
+        """
+        Returns
+        -------
+        list
+        """
         return self.data.index
 
     @property
     def columns(self):
+        """
+        Returns
+        -------
+        list
+        """
         return self.data.columns
 
     @property
     def shape(self):
+        """
+        Returns
+        -------
+        tuple
+        """
         return self.data.shape

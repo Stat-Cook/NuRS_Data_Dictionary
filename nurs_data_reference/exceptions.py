@@ -1,3 +1,7 @@
-class OverlapException(Exception):
-    pass
+"""
+Custom exceptions for project.
+"""
 
+
+class OverlapException(Exception):
+    """Custom exception if values already exist on merge."""
