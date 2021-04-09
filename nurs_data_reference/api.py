@@ -3,9 +3,10 @@ Easy use APIs
 """
 from .reference_spider import ReferenceSpider
 from .description_frame import DescriptionFrame
+from .group_to_reference import GroupReference
 
 
-def find_all_columns(path, description_frame: DescriptionFrame = None):
+def find_all_columns(path, description_frame: DescriptionFrame = None) -> GroupReference:
     """
     Explore the folder structure at 'path' for csv and excel files.
     Extracts columns from every data set.
@@ -17,7 +18,7 @@ def find_all_columns(path, description_frame: DescriptionFrame = None):
         A frame containing columns=["Description", "Notes"]
     Returns
     -------
-    GroupedReference
+    GroupReference
     """
     spider = ReferenceSpider(path)
     return spider.to_reference(description_frame)
