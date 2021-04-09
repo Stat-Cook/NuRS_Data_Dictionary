@@ -37,7 +37,11 @@ class ReferenceSpider:
             file = os.path.join(path, i)
 
             if ".xls" in i:
-                sheets = pd.read_excel(file, sheet_name=None)
+                engine = None
+                if ".xlsb" in in:
+                    engine = "pyxlsb"
+
+                sheets = pd.read_excel(file, engine=engine, sheet_name=None)
                 for sheet in sheets:
                     yield sheets[sheet]
 
