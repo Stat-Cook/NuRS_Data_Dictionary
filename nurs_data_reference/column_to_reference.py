@@ -47,6 +47,8 @@ class ColumnReference:
         -------
         list
         """
+        if self.length == 0:
+            return k*[(None, 0)]
         common = self.counter.most_common(k)
         while len(common) < k:
             common += [(None, 0)]
