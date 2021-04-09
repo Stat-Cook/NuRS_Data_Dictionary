@@ -23,8 +23,9 @@ class ColumnReference:
 
     def __init__(self, data: pd.Series, column_name: str,
                  description_frame: DescriptionFrame = None):
-
-        self.counter = Counter(data) # .fillna("_nan_"))
+        
+        print(column_name)
+        self.counter = Counter(data.fillna("_nan_"))
         self.column_name = column_name
         if description_frame:
             if column_name not in description_frame.index:
