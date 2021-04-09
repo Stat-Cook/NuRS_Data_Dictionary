@@ -47,8 +47,6 @@ class ColumnReference:
         -------
         list
         """
-        if self.length == 0:
-            return k*[(None, 0)]
         common = self.counter.most_common(k)
         while len(common) < k:
             common += [(None, 0)]
@@ -83,10 +81,14 @@ class ColumnReference:
             "Column_name": self.column_name,
             "N_unique": self._n_unique(),
         }
+
+        div_by = self.length + bool(self.length == 0)
+
         results.update(dict(zip(
             [f"Common {i}" for i in range(1, 1 + n_most_common)],
-            [(i, f"{100*j/self.length:.2f}%") for i, j in self._most_common(n_most_common)]
+            [(i, f"{100*j/div_by:.2f}%") for i, j in self._most_common(n_most_common)]
         )))
+
         results.update(self._fetch_descriptions())
         return results
 
