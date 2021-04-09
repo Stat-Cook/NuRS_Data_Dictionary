@@ -34,18 +34,19 @@ class ReferenceSpider:
         if not path:
             path = self.file_path
         for i in os.listdir(path):
+            extension = self.get_file_type(i)
             file = os.path.join(path, i)
 
-            if ".xls" in i:
+            if "xls" in extension:
                 engine = None
-                if ".xlsb" in i:
+                if "xlsb" in extension:
                     engine = "pyxlsb"
 
                 sheets = pd.read_excel(file, engine=engine, sheet_name=None)
                 for sheet in sheets:
                     yield sheets[sheet]
 
-            if ".csv" in i:
+            if "csv" in extension:
                 yield pd.read_csv(file)
 
             if os.path.isdir(file):
@@ -65,3 +66,9 @@ class ReferenceSpider:
         GroupReference
         """
         return GroupReference(self.path_handler(), description_frame)
+
+    @staticmethod
+    def get_file_type(string):
+        assert "." in string
+        elements = string.split(".")
+        return elements[-1].lower()
