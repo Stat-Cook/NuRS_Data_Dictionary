@@ -38,7 +38,7 @@ class ReferenceSpider:
 
             if ".xls" in i:
                 engine = None
-                if ".xlsb" in in:
+                if ".xlsb" in i:
                     engine = "pyxlsb"
 
                 sheets = pd.read_excel(file, engine=engine, sheet_name=None)
