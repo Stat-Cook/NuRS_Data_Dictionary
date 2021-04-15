@@ -6,9 +6,9 @@ import numpy as np
 column_name = lambda: "".join(np.random.choice(list("ABCDE"), 5))
 
 
-def fake_data(k):
+def fake_data(k, p):
     return pd.DataFrame(
-        np.random.choice(list("ABCDE"), [50, k]),
+        np.random.choice(list("ABCDE"), [p, k]),
         columns=[column_name() for _ in range(k)]
     )
 
@@ -26,4 +26,7 @@ if __name__ == '__main__':
     for dir in ["spider_folder", "spider_folder/first_layer",
                 "spider_folder/first_layer/second_layer"]:
         for i in range(2):
-            fake_data(5).to_csv(os.path.join(file_path, dir, f"file {i}.csv"), index=False)
+            fake_data(50, 500).to_csv(os.path.join(file_path, dir, f"file {i}.csv"), index=False)
+        for i in range(2):
+            fake_data(50, 500).to_excel(os.path.join(file_path, dir, f"Data.xlsx"),
+                                  index=False, sheet_name=f"Sheet {i}")

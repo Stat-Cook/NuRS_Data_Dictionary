@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import time
 
 from ..column_to_reference import ColumnReference
 from ..description_frame import DescriptionFrame
@@ -14,6 +15,11 @@ def simple_column():
 def simple_description_frame():
     frm = pd.DataFrame(columns=["Description", "Notes"], index=["Test"])
     return DescriptionFrame(frm)
+
+
+@pytest.fixture
+def nan_frame():
+    return pd.DataFrame(index=range(10000), columns=["A", "B"])
 
 
 @pytest.fixture
@@ -48,3 +54,9 @@ def test_description_injection(simple_column, simple_description_frame):
     cr = ColumnReference(simple_column, "Test 2", simple_description_frame)
     assert "Test 2" in cr.description_frame.index
     assert "Test 2" in simple_description_frame.index
+
+
+def test_nan_column_speed(nan_frame, simple_description_frame):
+    t0 = time.time()
+    ColumnReference(nan_frame["A"], "Nan_data", simple_description_frame)
+    assert (time.time() - t0) < 1
