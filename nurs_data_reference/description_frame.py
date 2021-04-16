@@ -24,7 +24,8 @@ class DescriptionFrame:
         self.default_columns = ["Description", "Notes", "Found In"]
         if not all(i in data.columns for i in self.default_columns):
             if add_columns:
-                for i in self.default_columns not in data.columns:
+                to_add = set(self.default_columns).difference(data.columns)
+                for i in to_add:
                     data[i] = None
             else:
                 raise MissingColumnsException(f"Not all of "
