@@ -7,13 +7,20 @@ from ..group_to_reference import GroupReference
 @pytest.fixture
 def data_group():
     return [
-        pd.DataFrame({
-            "Col 1": np.random.choice(list("ABC"), 50),
-            "Col 2": np.random.choice(list("ABBBBC"), 50)
-        }),
-        pd.DataFrame({
-            "Col 3": np.random.choice(list("ABC"), 50),
-            "Col 4": np.random.choice(list("ABBBBC"), 50)})
+        [
+            pd.DataFrame({
+                "Col 1": np.random.choice(list("ABC"), 50),
+                "Col 2": np.random.choice(list("ABBBBC"), 50)
+            }),
+            "Data 1"
+        ],
+        [
+            pd.DataFrame({
+                "Col 3": np.random.choice(list("ABC"), 50),
+                "Col 4": np.random.choice(list("ABBBBC"), 50)
+            }),
+            "Data 2"
+        ]
     ]
 
 

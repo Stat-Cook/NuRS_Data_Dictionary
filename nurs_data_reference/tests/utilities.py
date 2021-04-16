@@ -7,10 +7,12 @@ column_name = lambda: "".join(np.random.choice(list("ABCDE"), 5))
 
 
 def fake_data(k, p):
-    return pd.DataFrame(
+    frame = pd.DataFrame(
         np.random.choice(list("ABCDE"), [p, k]),
         columns=[column_name() for _ in range(k)]
     )
+    frame["Constant"] = range(p)
+    return frame
 
 
 if __name__ == '__main__':
@@ -23,10 +25,14 @@ if __name__ == '__main__':
     data.to_csv("test_files/example_data.csv", index=False)
 
     file_path = "test_files"
+    j = 0
     for dir in ["spider_folder", "spider_folder/first_layer",
                 "spider_folder/first_layer/second_layer"]:
         for i in range(2):
-            fake_data(50, 500).to_csv(os.path.join(file_path, dir, f"file {i}.csv"), index=False)
+            j += 1
+            fake_data(10, 50).to_csv(os.path.join(file_path, dir, f"file {j}.csv"),
+                                     index=False)
         for i in range(2):
-            fake_data(50, 500).to_excel(os.path.join(file_path, dir, f"Data.xlsx"),
+            j += 1
+            fake_data(10, 50).to_excel(os.path.join(file_path, dir, f"Data {j}.xlsx"),
                                   index=False, sheet_name=f"Sheet {i}")

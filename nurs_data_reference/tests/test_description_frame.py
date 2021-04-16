@@ -9,8 +9,7 @@ def test_data_path():
 
 @pytest.fixture
 def description_frame(test_data_path):
-    data = pd.DataFrame(columns=["Description", "Notes"], index=["Col 1", "Col 2"])
-    return DescriptionFrame(data)
+    return DescriptionFrame.blank_from_index(["Col 1", "Col 2"])
 
 @pytest.fixture
 def proposed_items():

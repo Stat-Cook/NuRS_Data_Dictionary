@@ -13,8 +13,7 @@ def simple_column():
 
 @pytest.fixture
 def simple_description_frame():
-    frm = pd.DataFrame(columns=["Description", "Notes"], index=["Test"])
-    return DescriptionFrame(frm)
+    return DescriptionFrame.blank_from_index(["Test"])
 
 
 @pytest.fixture
