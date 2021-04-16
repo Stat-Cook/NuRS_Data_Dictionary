@@ -24,22 +24,24 @@ class GroupReference(FrameReference):
     def __init__(self, iterator: Iterator,
                  description_frame: DescriptionFrame = None):
         super().__init__(pd.DataFrame([]), description_frame)
-        for i in iterator:
-            self.append_column_references(i)
+        for data, name in iterator:
+            self.append_column_references(data, name)
 
-    def append_column_references(self, data) -> None:
+    def append_column_references(self, data, name=None) -> None:
         """
         Add ColumnReference objects for the new data set
         Parameters
         ----------
         data: pandas.DataFrame
             The data set with columns to be processed.
+        name: str [optional]
+            Name of the data set the column comes from.
         Returns
         -------
 
         """
         self.columns += list(data.columns)
         self.column_references += [
-            ColumnReference(data[i], i, self.description_frame)
+            ColumnReference(data[i], i, self.description_frame, name)
             for i in data
         ]
