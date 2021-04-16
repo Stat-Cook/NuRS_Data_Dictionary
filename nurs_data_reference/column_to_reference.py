@@ -22,15 +22,20 @@ class ColumnReference:
     """
 
     def __init__(self, data: pd.Series, column_name: str,
-                 description_frame: DescriptionFrame = None):
-        
-        print(column_name)
+                 description_frame: DescriptionFrame = None,
+                 source_name=None):
+
         self.counter = Counter(data.fillna("_nan_"))
         self.column_name = column_name
+
         if description_frame:
             if column_name not in description_frame.index:
                 description_frame.add_rows(column_name)
-        self.description_frame = description_frame
+        self.description_frame = description_frame or \
+            DescriptionFrame.blank_from_index([column_name])
+
+        self.description_frame[column_name]["Found In"].update([source_name])
+
         self.length = data.shape[0]
 
     def _most_common(self, k: int = 3) -> list:

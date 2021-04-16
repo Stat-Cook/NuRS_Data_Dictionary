@@ -5,9 +5,10 @@ Implement a frame to track the human descriptors and notes on each data column.
 from typing import Union
 import pandas as pd
 
-from .exceptions import OverlapException
+from .exceptions import OverlapException, MissingColumnsException
 from .frame_to_word import frame_to_word
 from .word2reference.read_word import WordReader
+from .utilities import string_to_iterable, iterable_to_string
 
 
 class DescriptionFrame:
@@ -19,27 +20,19 @@ class DescriptionFrame:
         Each row is a different column.
     """
 
-    def __init__(self, data: pd.DataFrame):
-        self.default_columns = ["Description", "Notes"]
-        assert all(i in data.columns for i in self.default_columns)
-        self.data = data
+    def __init__(self, data: pd.DataFrame, add_columns=False):
+        self.default_columns = ["Description", "Notes", "Found In"]
+        if not all(i in data.columns for i in self.default_columns):
+            if add_columns:
+                for i in self.default_columns not in data.columns:
+                    data[i] = None
+            else:
+                raise MissingColumnsException(f"Not all of "
+                                              f"{','.join(self.default_columns)} "
+                                              f"in supplied Data Frame. ")
 
-    @classmethod
-    def from_file(cls, file_path: str, sheet_name=0):
-        """
-        Generate DescriptionFrame from excel
-        Parameters
-        ----------
-        file_path: str
-            Path to an excel file.
-        sheet_name: str [optional]
-            The sheet on which the DescriptionFrame is stored.
-        Returns
-        -------
-        DescriptionFrame
-        """
-        data = pd.read_excel(file_path, sheet_name=sheet_name)
-        return cls(data)
+        self.data = data
+        self._convert_na_to_empty_set()
 
     @classmethod
     def blank_from_index(cls, index):
@@ -53,7 +46,7 @@ class DescriptionFrame:
         -------
         DescriptionFrame
         """
-        data = pd.DataFrame(columns=["Description", "Notes"], index=index)
+        data = pd.DataFrame(columns=["Description", "Notes",  "Found In"], index=index)
         return cls(data)
 
     @classmethod
@@ -74,6 +67,25 @@ class DescriptionFrame:
         return cls(data)
 
     @classmethod
+    def from_file(cls, file_path: str, sheet_name=0):
+        """
+        Generate DescriptionFrame from excel
+        Parameters
+        ----------
+        file_path: str
+            Path to an excel file.
+        sheet_name: str [optional]
+            The sheet on which the DescriptionFrame is stored.
+        Returns
+        -------
+        DescriptionFrame
+        """
+        data = pd.read_excel(file_path, sheet_name=sheet_name)
+        data["Found In"] = data["Found In"].apply(lambda x: string_to_iterable(x, set))
+        return cls(data)
+
+
+    @classmethod
     def from_word(cls, file: str):
         """
         Generate a DescriptionFrame from word.
@@ -89,7 +101,7 @@ class DescriptionFrame:
         reader = WordReader(file)
         data = reader.parse_document()
         data = pd.DataFrame(data).T
-        return cls(data)
+        return cls(data, True)
 
     def to_excel(self, file_path: str, sheet_name=1):
         """
@@ -104,6 +116,8 @@ class DescriptionFrame:
         -------
         None
         """
+        data = self.data
+        data["Found In"] = data["Found In"].apply(iterable_to_string)
         self.data.to_excel(file_path, sheet_name=sheet_name)
 
     def to_word(self, file):
@@ -123,6 +137,8 @@ class DescriptionFrame:
         -------
         None
         """
+        data = self.data
+        data["Found In"] = data["Found In"].apply(iterable_to_string)
         frame_to_word(self.data, file)
 
     def add_rows(self, new_items: Union[list, str], overlap="unique") -> None:
@@ -181,6 +197,7 @@ class DescriptionFrame:
             index=new_items
         )
         self.data = pd.concat([self.data, new_rows])
+        self._convert_na_to_empty_set()
 
     def __getitem__(self, item):
         return self.data.loc[item]
@@ -211,3 +228,7 @@ class DescriptionFrame:
         tuple
         """
         return self.data.shape
+
+    def _convert_na_to_empty_set(self, column="Found In"):
+        nas = self.data[column].isna()
+        self.data.loc[nas, column] = self.data.loc[nas, column].apply(lambda x: set())
