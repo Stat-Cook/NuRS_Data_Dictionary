@@ -44,10 +44,10 @@ class ReferenceSpider:
 
                 sheets = pd.read_excel(file, engine=engine, sheet_name=None)
                 for sheet in sheets:
-                    yield sheets[sheet]
+                    yield sheets[sheet], i
 
             if "csv" in extension:
-                yield pd.read_csv(file)
+                yield pd.read_csv(file), i
 
             if os.path.isdir(file):
                 for j in self.path_handler(file):
@@ -69,6 +69,7 @@ class ReferenceSpider:
 
     @staticmethod
     def get_file_type(string):
-        assert "." in string
+        if "." not in string:
+            return ""
         elements = string.split(".")
         return elements[-1].lower()
