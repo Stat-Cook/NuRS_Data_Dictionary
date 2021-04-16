@@ -34,3 +34,8 @@ def test_add_rows_force(description_frame, proposed_items):
     description_frame.add_rows(proposed_items, overlap="force")
     assert description_frame.data.shape[0] == 5
 
+
+def test_to_and_from_word(description_frame: DescriptionFrame):
+    description_frame.to_word("temp.docx")
+    df = DescriptionFrame.from_word("temp.docx")
+    assert isinstance(df, DescriptionFrame)
