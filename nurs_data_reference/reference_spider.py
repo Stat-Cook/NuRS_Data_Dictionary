@@ -67,6 +67,22 @@ class ReferenceSpider:
         """
         return GroupReference(self.path_handler(), description_frame)
 
+    def api_reference(self, description_path: str = None) -> GroupReference:
+        """
+        Converts the result of the spider to a single GroupReference
+        Parameters
+        ----------
+        description_path: str
+
+        Returns
+        -------
+        GroupReference
+        """
+        ref = GroupReference.without_data()
+        ref.description_frame.from_word(description_path)
+        ref.inject_data(self.path_handler())
+        return ref
+
     @staticmethod
     def get_file_type(string):
         if "." not in string:

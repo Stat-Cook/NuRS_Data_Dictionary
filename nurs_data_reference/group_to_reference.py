@@ -24,8 +24,11 @@ class GroupReference(FrameReference):
     def __init__(self, iterator: Iterator,
                  description_frame: DescriptionFrame = None):
         super().__init__(pd.DataFrame([]), description_frame)
-        for data, name in iterator:
-            self.append_column_references(data, name)
+        self.inject_data(iterator)
+
+    @classmethod
+    def without_data(cls, description_frame: DescriptionFrame = None):
+        return cls(pd.DataFrame([]), description_frame)
 
     def append_column_references(self, data, name=None) -> None:
         """
@@ -45,3 +48,7 @@ class GroupReference(FrameReference):
             ColumnReference(data[i], i, self.description_frame, name)
             for i in data
         ]
+
+    def inject_data(self, iterator: Iterator):
+        for data, name in iterator:
+            self.append_column_references(data, name)
